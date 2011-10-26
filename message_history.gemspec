@@ -34,4 +34,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency("plist")
   s.add_dependency("mail")
+  s.add_dependency("fssm")
 end
