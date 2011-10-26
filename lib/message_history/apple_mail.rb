@@ -17,7 +17,34 @@ module MessageHistory
 
       new(content, meta)
     end
-  
+
+    def to_message
+      MessageHistory::Message.new(Array(from), Array(to), to_message_body, to_message_meta_data)
+    end
+
+    def to_message_body
+      if parts.empty? then
+        part = self
+      else
+        part = parts.find { |part| part.content_type =~ %r{text/plain} } ||
+               parts.find { |part| part.content_type =~ %r{text/html} }
+      end
+      charset = part.charset
+      case part.content_type
+        when %r{text/plain}
+          body = part.body.to_s.force_encoding(charset).encode(Encoding::UTF_8)
+        when %r{text/html}
+          html = part.body.to_s.force_encoding(charset).encode(Encoding::UTF_8)
+          body = Nokogiri.HTML(html).text
+      end
+
+      "#{subject}\n#{body}"
+    end
+
+    def to_message_meta_data
+      {}
+    end
+
     def self.from_string(string)
       size    = string[0,11].to_i
       content = string[11,size]
