@@ -1,6 +1,5 @@
 require 'plist'
 require 'mail'
-require 'fssm'
 
 module MessageHistory
 
@@ -18,7 +17,8 @@ module MessageHistory
       new(content, meta)
     end
     
-    def self.watch                   
+    def self.watch   
+      require 'fssm'                
       FSSM.monitor('~/Library/Mail', '**/*.emlx') do
            create {|base, relative| MessageHistory << MessageHistory::AppleMail.read(File.join(base,relative)) }
       end                              
